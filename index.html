@@ -7,7 +7,7 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com/"></script>
-<style>
+<style>h
 body{font-family:sans-serif;background:#f8fafc}
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
 .card{background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:16px;margin-bottom:12px}
@@ -53,12 +53,12 @@ function App(){
 const[tab,sTab]=useState("board"),[ini,sIni]=useState([]),[per,sPer]=useState([]),[load,sLoad]=useState(true),[apiOk,sApiOk]=useState(null),[q,sQ]=useState(""),[fE,sFE]=useState(""),[showF,sShowF]=useState(false),[edit,sEdit]=useState(null),[showP,sShowP]=useState(false),[editP,sEditP]=useState(null),[toast,sToast]=useState(null);
 const msg=(m,t="ok")=>{sToast({m,t});setTimeout(()=>sToast(null),3500);};
 const fetch2=useCallback(async()=>{sLoad(true);try{const r=await fetch(API+"?action=getAll");const d=await r.json();if(d.success){sIni(d.data.iniciativas||[]);sPer(d.data.personas||[]);sApiOk(true);}else sApiOk(false);}catch{sApiOk(false);try{const l=localStorage.getItem("mc_i");if(l)sIni(JSON.parse(l));}catch{}try{const l=localStorage.getItem("mc_p");if(l)sPer(JSON.parse(l));}catch{}}sLoad(false);},[]);
-useEffect(()=>{fetch2();},[fetch2]);
+useEffect(()=>{fetch2();},[fetch2]);h
 const saveI=async(item)=>{try{if(!item.id)item.id=Date.now().toString();const at=(item.tareas||[]);item.avance=calcAvance(at);item.historial=(item.historial||"")+"|"+new Date().toLocaleString("es-CL")+":OK";await fetch(API,{method:"POST",body:JSON.stringify({action:"saveIniciativa",iniciativa:item})});await fetch2();msg("Guardada ok");}catch{const l=[...ini];const i=l.findIndex(x=>x.id==item.id);if(i>=0)l[i]=item;else l.push(item);sIni(l);localStorage.setItem("mc_i",JSON.stringify(l));msg("Local","warn");}sShowF(false);sEdit(null);};
 const saveP=async(p)=>{try{if(!p.id)p.id="p"+Date.now();await fetch(API,{method:"POST",body:JSON.stringify({action:"savePersona",persona:p})});await fetch2();msg("OK");}catch{const l=[...per];const i=l.findIndex(x=>x.id==p.id);if(i>=0)l[i]=p;else l.push(p);sPer(l);localStorage.setItem("mc_p",JSON.stringify(l));}sEditP(null);};
 const filtradas=ini.filter(i=>{const qq=q.toLowerCase();return(!qq||i.nombre?.toLowerCase().includes(qq)||i.responsable?.toLowerCase().includes(qq))&&(!fE||i.estado===fE);});
 const venc=ini.filter(i=>{const h=new Date(),f=new Date(i.fechaCompromiso);return f<h&&i.estado!=="Completada"&&i.estado!=="Archivada";});
-const gmail=(i)=>{const pp=per.find(x=>x.nombre===i.responsable);window.open("https://mail.google.com/mail/?view=cm&to="+(pp?.email||"")+"&su="+encodeURIComponent("[MC] "+i.nombre)+"&body="+encodeURIComponent("Hola "+i.responsable+",\nIniciativa: "+i.nombre+"\nEstado: "+i.estado+"\nAvance: "+(i.avance||0)+"%"),"_blank");};
+const gmail=(i)=>{const pp=per.find(x=>x.nombre===i.responsable);let body="Hola "+i.responsable+",\n\n";body+="=== INICIATIVA ===\n";body+="Nombre: "+i.nombre+"\n";body+="Responsable: "+i.responsable+"\n";body+="Area: "+(i.area||"Sin asignar")+"\n";body+="Estado: "+i.estado+"\n";body+="Prioridad: "+(i.prioridad||"Sin definir")+"\n";body+="Avance: "+(i.avance||0)+"%\n";body+="Fecha Compromiso: "+(i.fechaCompromiso||"Sin fecha")+"\n";body+="Observaciones: "+(i.observaciones||"Sin observaciones")+"\n";if(i.equipo&&i.equipo.length>0){body+="\n=== EQUIPO ("+i.equipo.length+" miembros) ===\n";i.equipo.forEach((m,idx)=>{body+=(idx+1)+". "+m.nombre+" - "+(m.rol||"Sin rol")+" ("+(m.email||"Sin email")+")\n";});}if(i.tareas&&i.tareas.length>0){body+="\n=== TAREAS ("+i.tareas.length+") ===\n";i.tareas.forEach((t,idx)=>{body+="\n--- Tarea "+(idx+1)+" ---\n";body+="Titulo: "+(t.titulo||"Sin titulo")+"\n";body+="Responsable: "+(t.responsable||"Sin asignar")+"\n";body+="Estado: "+(t.estado||"Pendiente")+"\n";body+="Fecha Inicio: "+(t.fechaInicio||"Sin fecha")+"\n";body+="Fecha Fin: "+(t.fechaFin||"Sin fecha")+"\n";if(t.notas)body+="Notas: "+t.notas+"\n";});}else{body+="\n(Sin tareas asignadas)\n";}body+="\n---\nEnviado desde Comite Mejora Continua - In Situ Wines";window.open("https://mail.google.com/mail/?view=cm&to="+(pp?.email||"")+"&su="+encodeURIComponent("[MC] "+i.nombre)+"&body="+encodeURIComponent(body),"_blank");};
 const acti=ini.filter(i=>i.estado!=="Archivada");
 const grupos=ESTADOS.filter(e=>e!=="Archivada").map(estado=>({estado,items:filtradas.filter(i=>i.estado===estado)}));
 const allTasks=useMemo(()=>{const tasks=[];ini.forEach(i=>{(i.tareas||[]).forEach(t=>{tasks.push({...t,iniciativa:i.nombre,iniId:i.id});});});return tasks;},[ini]);
