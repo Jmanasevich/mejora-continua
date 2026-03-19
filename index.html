@@ -59,6 +59,7 @@ const saveP=async(p)=>{try{if(!p.id)p.id="p"+Date.now();await fetch(API,{method:
 const filtradas=ini.filter(i=>{const qq=q.toLowerCase();return(!qq||i.nombre?.toLowerCase().includes(qq)||i.responsable?.toLowerCase().includes(qq))&&(!fE||i.estado===fE);});
 const venc=ini.filter(i=>{const h=new Date(),f=new Date(i.fechaCompromiso);return f<h&&i.estado!=="Completada"&&i.estado!=="Archivada";});
 const gmail=(i)=>{const pp=per.find(x=>x.nombre===i.responsable);let body="Hola "+i.responsable+",\n\n";body+="=== INICIATIVA ===\n";body+="Nombre: "+i.nombre+"\n";body+="Responsable: "+i.responsable+"\n";body+="Area: "+(i.area||"Sin asignar")+"\n";body+="Estado: "+i.estado+"\n";body+="Prioridad: "+(i.prioridad||"Sin definir")+"\n";body+="Avance: "+(i.avance||0)+"%\n";body+="Fecha Compromiso: "+(i.fechaCompromiso||"Sin fecha")+"\n";body+="Observaciones: "+(i.observaciones||"Sin observaciones")+"\n";if(i.equipo&&i.equipo.length>0){body+="\n=== EQUIPO ("+i.equipo.length+" miembros) ===\n";i.equipo.forEach((m,idx)=>{body+=(idx+1)+". "+m.nombre+" - "+(m.rol||"Sin rol")+" ("+(m.email||"Sin email")+")\n";});}if(i.tareas&&i.tareas.length>0){body+="\n=== TAREAS ("+i.tareas.length+") ===\n";i.tareas.forEach((t,idx)=>{body+="\n--- Tarea "+(idx+1)+" ---\n";body+="Titulo: "+(t.titulo||"Sin titulo")+"\n";body+="Responsable: "+(t.responsable||"Sin asignar")+"\n";body+="Estado: "+(t.estado||"Pendiente")+"\n";body+="Fecha Inicio: "+(t.fechaInicio||"Sin fecha")+"\n";body+="Fecha Fin: "+(t.fechaFin||"Sin fecha")+"\n";if(t.notas)body+="Notas: "+t.notas+"\n";});}else{body+="\n(Sin tareas asignadas)\n";}body+="\n---\nEnviado desde Comite Mejora Continua - In Situ Wines";window.open("https://mail.google.com/mail/?view=cm&to="+(pp?.email||"")+"&su="+encodeURIComponent("[MC] "+i.nombre)+"&body="+encodeURIComponent(body),"_blank");};
+const deleteI=async(id)=>{if(!confirm("\u00bfEst\u00e1s seguro de que deseas ELIMINAR esta iniciativa? Esta acci\u00f3n no se puede deshacer."))return;try{await fetch(API,{method:"POST",body:JSON.stringify({action:"deleteIniciativa",id:id})});await fetch2();msg("Iniciativa eliminada");sShowF(false);sEdit(null);}catch(e){const l=ini.filter(x=>x.id!==id);sIni(l);localStorage.setItem("mc_i",JSON.stringify(l));msg("Eliminada localmente");sShowF(false);sEdit(null);}};
 const acti=ini.filter(i=>i.estado!=="Archivada");
 const grupos=ESTADOS.filter(e=>e!=="Archivada").map(estado=>({estado,items:filtradas.filter(i=>i.estado===estado)}));
 const allTasks=useMemo(()=>{const tasks=[];ini.forEach(i=>{(i.tareas||[]).forEach(t=>{tasks.push({...t,iniciativa:i.nombre,iniId:i.id});});});return tasks;},[ini]);
@@ -174,7 +175,7 @@ ini.filter(i=>!i.responsable&&i.estado!=="Archivada").map(i=>(
 </div>))}
 </div>}
 </div>
-{showF&&<FormI ini={edit} per={per} onSave={saveI} onClose={()=>{sShowF(false);sEdit(null);}} onGmail={gmail}/>}
+{showF&&<FormI ini={edit} per={per} onSave={saveI} onClose={()=>{sShowF(false);sEdit(null);}} onGmail={gmail} onDelete={deleteI}/>}
 {showP&&<div className="modal-overlay" onClick={()=>sShowP(false)}><div className="modal" style={{maxWidth:700}} onClick={e=>e.stopPropagation()}>
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
 <h2 style={{fontWeight:800,fontSize:18,margin:0}}>Directorio</h2>
@@ -208,7 +209,7 @@ filtered.map(p=>(<div key={p.id} className="dropdown-item" onClick={(e)=>{e.stop
 </div></>}
 </div>);
 }
-function FormI({ini,per,onSave,onClose,onGmail}){
+function FormI({ini,per,onSave,onClose,onGmail,onDelete}){
 const E={nombre:"",responsable:"",area:"Operaciones",prioridad:"Alta",estado:"No Iniciada",avance:0,fechaCompromiso:"",observaciones:"",equipo:[],tareas:[]};
 const[f,sF]=useState(ini?{...ini,equipo:Array.isArray(ini.equipo)?ini.equipo:[],tareas:Array.isArray(ini.tareas)?ini.tareas:[]}:E);
 const[formTab,sFormTab]=useState("info");
@@ -277,7 +278,7 @@ return(<div key={m.id} style={{display:"flex",alignItems:"center",justifyContent
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
 <div><h3 style={{margin:0,fontSize:15,fontWeight:700}}>Tareas</h3>
 <p style={{margin:"4px 0 0",fontSize:12,color:"#94a3b8"}}>Avance: {taskDone}/{taskCount} completadas = {autoAvance}%</p></div>
-<button className="btn btn-primary" style={{fontSize:12}} onClick={addTask}>+ Nueva Tarea</button>
+<button className="btn btn-primary" style={{fontSize:12}} onClick={addTask}>+ Nueva Tarea</button> {(f.tareas||[]).length>0&&<button className="btn btn-danger" style={{fontSize:12}} onClick={()=>{if(confirm("\u00bfBorrar TODAS las tareas de esta iniciativa?"))sF(x=>({...x,tareas:[]}))}}>Borrar Tareas</button>}
 </div>
 {taskCount>0&&<div style={{display:"flex",gap:12,marginBottom:16}}>
 {TASK_ESTADOS.map(e=>{const count=(f.tareas||[]).filter(t=>t.estado===e).length;
@@ -318,7 +319,7 @@ return(<div key={t.id} className={"task-row"+(od?" task-overdue":t.estado==="Com
 </div>}
 </div>}
 <div style={{display:"flex",gap:8,marginTop:16,justifyContent:"flex-end",borderTop:"1px solid #e2e8f0",paddingTop:16}}>
-{ini&&<button className="btn btn-secondary" onClick={()=>onGmail(f)}>Email</button>}
+{ini&&onDelete&&<button className="btn btn-danger" onClick={()=>onDelete(f.id)}>Eliminar</button>} {ini&&<button className="btn btn-secondary" onClick={()=>onGmail(f)}>Email</button>}
 <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
 <button className="btn btn-primary" onClick={()=>{if(f.nombre.trim()){const toSave={...f,avance:taskCount>0?autoAvance:(f.avance||0)};onSave(toSave);}}}>{ini?"Guardar":"Crear"}</button>
 </div>
