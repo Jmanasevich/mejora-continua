@@ -41,8 +41,8 @@ const PRIOS=["Alta","Media","Baja"];
 const AREAS=["Operaciones","Calidad","Enologia","Produccion","Finanzas","Logistica","Comercial","RRHH"];
 const TASK_ESTADOS=["Pendiente","En Progreso","Completada","Bloqueada"];
 const E_ICON={"Completada":"\u2705","En Progreso":"\u23F3","Bloqueada":"\u26D4","Pendiente":"\u23F8"};
-const E_BG={"Completada":"#dcfce7","En Progreso":"#fef9c3","Bloqueada":"#fee2e2","Pendiente":"#f1f5f9"};
-const E_CL={"Completada":"#166534","En Progreso":"#854d0e","Bloqueada":"#991b1b","Pendiente":"#475569"};
+const E_BG={"Completada":"#dcfce7","En Progreso":"#fef9c3","Bloqueada":"#fee2e2","Pendiente":"#f1f5f9","No Iniciada":"#f1f5f9","Avance +":"#fef9c3","Avance ++":"#fde68a","Avance +++":"#bef264"};
+const E_CL={"Completada":"#166534","En Progreso":"#854d0e","Bloqueada":"#991b1b","Pendiente":"#475569","No Iniciada":"#475569","Avance +":"#92400e","Avance ++":"#78350f","Avance +++":"#365314"};
 function sem(i){const h=new Date(),f=new Date(i.fechaCompromiso),a=Number(i.avance)||0;if(i.estado==="Completada")return"ok";if(i.estado==="Bloqueada")return"err";if(f<h&&a<100)return"err";return((f-h)/864e5)<14&&a<70?"warn":"ok";}
 function cE(e){return e==="Completada"?{background:"#dcfce7",color:"#166534"}:e==="En Progreso"?{background:"#fef9c3",color:"#854d0e"}:e==="Bloqueada"?{background:"#fee2e2",color:"#991b1b"}:{background:"#f1f5f9",color:"#475569"};}
 function cP(p){return p==="Alta"?{background:"#fee2e2",color:"#991b1b"}:p==="Media"?{background:"#fef9c3",color:"#854d0e"}:{background:"#dcfce7",color:"#166534"};}
@@ -61,6 +61,7 @@ const venc=ini.filter(i=>{const h=new Date(),f=new Date(i.fechaCompromiso);retur
 const gmail=(i)=>{const pp=per.find(x=>x.nombre===i.responsable);let body="Hola "+i.responsable+",\n\n";body+="=== INICIATIVA ===\n";body+="Nombre: "+i.nombre+"\n";body+="Responsable: "+i.responsable+"\n";body+="Area: "+(i.area||"Sin asignar")+"\n";body+="Estado: "+i.estado+"\n";body+="Prioridad: "+(i.prioridad||"Sin definir")+"\n";body+="Avance: "+(i.avance||0)+"%\n";body+="Fecha Compromiso: "+(i.fechaCompromiso||"Sin fecha")+"\n";body+="Observaciones: "+(i.observaciones||"Sin observaciones")+"\n";if(i.equipo&&i.equipo.length>0){body+="\n=== EQUIPO ("+i.equipo.length+" miembros) ===\n";i.equipo.forEach((m,idx)=>{body+=(idx+1)+". "+m.nombre+" - "+(m.rol||"Sin rol")+" ("+(m.email||"Sin email")+")\n";});}if(i.tareas&&i.tareas.length>0){body+="\n=== TAREAS ("+i.tareas.length+") ===\n";i.tareas.forEach((t,idx)=>{body+="\n--- Tarea "+(idx+1)+" ---\n";body+="Titulo: "+(t.titulo||"Sin titulo")+"\n";body+="Responsable: "+(t.responsable||"Sin asignar")+"\n";body+="Estado: "+(t.estado||"Pendiente")+"\n";body+="Fecha Inicio: "+(t.fechaInicio||"Sin fecha")+"\n";body+="Fecha Fin: "+(t.fechaFin||"Sin fecha")+"\n";if(t.notas)body+="Notas: "+t.notas+"\n";});}else{body+="\n(Sin tareas asignadas)\n";}body+="\n---\nEnviado desde Comite Mejora Continua - In Situ Wines";window.open("https://mail.google.com/mail/?view=cm&to="+(pp?.email||"")+"&su="+encodeURIComponent("[MC] "+i.nombre)+"&body="+encodeURIComponent(body),"_blank");};
 const deleteI=async(id)=>{if(!confirm("\u00bfEst\u00e1s seguro de que deseas ELIMINAR esta iniciativa? Esta acci\u00f3n no se puede deshacer."))return;try{await fetch(API,{method:"POST",body:JSON.stringify({action:"deleteIniciativa",id:id})});await fetch2();msg("Iniciativa eliminada");sShowF(false);sEdit(null);}catch(e){const l=ini.filter(x=>x.id!==id);sIni(l);localStorage.setItem("mc_i",JSON.stringify(l));msg("Eliminada localmente");sShowF(false);sEdit(null);}};
 const acti=ini.filter(i=>i.estado!=="Archivada");
+const boardGrupos=[{estado:"No Iniciada",items:filtradas.filter(i=>i.estado==="No Iniciada")},{estado:"Avance +",items:filtradas.filter(i=>i.estado==="En Progreso"&&(i.avance||0)<=33)},{estado:"Avance ++",items:filtradas.filter(i=>i.estado==="En Progreso"&&(i.avance||0)>33&&(i.avance||0)<=66)},{estado:"Avance +++",items:filtradas.filter(i=>i.estado==="En Progreso"&&(i.avance||0)>66)}];
 const grupos=ESTADOS.filter(e=>e!=="Archivada").map(estado=>({estado,items:filtradas.filter(i=>i.estado===estado)}));
 const allTasks=useMemo(()=>{const tasks=[];ini.forEach(i=>{(i.tareas||[]).forEach(t=>{tasks.push({...t,iniciativa:i.nombre,iniId:i.id});});});return tasks;},[ini]);
 const overdueTasks=allTasks.filter(t=>t.estado!=="Completada"&&isOverdue(t.fechaFin));
@@ -85,12 +86,12 @@ return(<div style={{minHeight:"100vh",background:"#f8fafc"}}>
 <select style={{width:170}} value={fE} onChange={e=>sFE(e.target.value)}><option value="">Todos estados</option>{ESTADOS.map(s=><option key={s}>{s}</option>)}</select>
 <button className="btn btn-secondary" onClick={fetch2}>{"\u21BB"} Sync</button>
 </div>
-<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20}}>
-{[["Total",acti.length,"#eff6ff","#1e40af"],["En Progreso",ini.filter(i=>i.estado==="En Progreso").length,"#fefce8","#92400e"],["Completadas",ini.filter(i=>i.estado==="Completada").length,"#f0fdf4","#14532d"],["Vencidas",venc.length,"#fef2f2","#991b1b"]].map(([l,v,bg,c])=>(
+<div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:20}}>
+{[["Total",acti.length,"#eff6ff","#1e40af"],["Avance +",ini.filter(i=>i.estado==="En Progreso"&&(i.avance||0)<=33).length,"#fef9c3","#92400e"],["Avance ++",ini.filter(i=>i.estado==="En Progreso"&&(i.avance||0)>33&&(i.avance||0)<=66).length,"#fde68a","#78350f"],["Avance +++",ini.filter(i=>i.estado==="En Progreso"&&(i.avance||0)>66).length,"#bef264","#365314"],["Vencidas",venc.length,"#fef2f2","#991b1b"]].map(([l,v,bg,c])=>(
 <div key={l} style={{background:bg,borderRadius:14,padding:"16px 20px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:c}}>{v}</div><div style={{fontSize:13,color:c,fontWeight:600,marginTop:4}}>{l}</div></div>
 ))}</div>
 {tab==="board"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
-{grupos.map(({estado,items})=>(<div key={estado}>
+{boardGrupos.map(({estado,items})=>(<div key={estado}>
 <div className="badge" style={{width:"100%",textAlign:"center",padding:"8px",marginBottom:10,display:"block",...cE(estado)}}>{estado} ({items.length})</div>
 {items.map(i=>{const tc=(i.tareas||[]).length;const td=(i.tareas||[]).filter(t=>t.estado==="Completada").length;const tov=(i.tareas||[]).filter(t=>t.estado!=="Completada"&&isOverdue(t.fechaFin)).length;
 return(<div key={i.id} className="card" style={{cursor:"pointer"}} onClick={()=>{sEdit(i);sShowF(true);}}>
