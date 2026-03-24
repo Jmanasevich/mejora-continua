@@ -38,6 +38,7 @@ const {useState,useEffect,useCallback,useMemo}=React;
 const API="https://script.google.com/macros/s/AKfycbzpXyst3RD8yJcAl9OqKuYudQw40e45cYbt6nCcT8cSGcF5l863adi24-1O-swkHgSCmw/exec";
 const ESTADOS=["No Iniciada","En Progreso","Completada","Bloqueada","Archivada"];
 const PRIOS=["Alta","Media","Baja"];
+const TIPOS=["Táctica","Estratégica"];
 const AREAS=["Operaciones","Calidad","Enologia","Produccion","Finanzas","Logistica","Comercial","RRHH"];
 const TASK_ESTADOS=["Pendiente","En Progreso","Completada","Bloqueada"];
 const E_ICON={"Completada":"\u2705","En Progreso":"\u23F3","Bloqueada":"\u26D4","Pendiente":"\u23F8"};
@@ -211,7 +212,7 @@ filtered.map(p=>(<div key={p.id} className="dropdown-item" onClick={(e)=>{e.stop
 </div>);
 }
 function FormI({ini,per,onSave,onClose,onGmail,onDelete}){
-const E={nombre:"",responsable:"",area:"Operaciones",prioridad:"Alta",estado:"No Iniciada",avance:0,fechaCompromiso:"",observaciones:"",equipo:[],tareas:[]};
+const E={nombre:"",responsable:"",area:"Operaciones",prioridad:"Alta",estado:"No Iniciada",avance:0,fechaCompromiso:"",observaciones:"",equipo:[],tareas:[],tipo:"Estratégica"};
 const[f,sF]=useState(ini?{...ini,equipo:Array.isArray(ini.equipo)?ini.equipo:[],tareas:Array.isArray(ini.tareas)?ini.tareas:[]}:E);
 const[formTab,sFormTab]=useState("info");
 const set=(k,v)=>sF(x=>({...x,[k]:v}));
@@ -239,9 +240,9 @@ return(<div className="modal-overlay" onClick={onClose}><div className="modal" s
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Responsable</label><select value={f.responsable} onChange={e=>set("responsable",e.target.value)}><option value="">Sin asignar</option>{per.map(p=><option key={p.id} value={p.nombre}>{p.nombre}</option>)}</select></div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Area</label><select value={f.area} onChange={e=>set("area",e.target.value)}>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
 </div>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{ESTADOS.map(s=><option key={s}>{s}</option>)}</select></div>
-<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Prioridad</label><select value={f.prioridad} onChange={e=>set("prioridad",e.target.value)}>{PRIOS.map(pp=><option key={pp}>{pp}</option>)}</select></div>
+equipo:[],tareas:[],tipo<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Prioridad</label><select value={f.prioridad} onChange={e=>set("prioridad",e.target.value)}>{PRIOS.map(pp=><option key={pp}>{pp}</option>)}</select></div> <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Tipo</label><select value={f.tipo} onChange={e=>set("tipo",e.target.value)}>{TIPOS.map(t=><option key={t}>{t}</option>)}</select></div>:"Estratégica"}
 </div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Avance: {taskCount>0?autoAvance:(f.avance||0)}%{taskCount>0&&<span style={{fontSize:11,color:"#2563eb",marginLeft:6}}>(auto: {taskDone}/{taskCount} tareas)</span>}</label>
