@@ -241,7 +241,7 @@ return(<div className="modal-overlay" onClick={onClose}><div className="modal" s
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Area</label><select value={f.area} onChange={e=>set("area",e.target.value)}>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
 </div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{ESTADOS.map(s=><option key={s}>{s}</option>)}</select></div>
+<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{[...ESTADOS,"Avance +","Avance ++","Avance +++"].map(s=><option key={s}>{s}</option>)}</select></div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Prioridad</label><select value={f.prioridad} onChange={e=>set("prioridad",e.target.value)}>{PRIOS.map(pp=><option key={pp}>{pp}</option>)}</select></div> <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Tipo</label><select value={f.tipo} onChange={e=>set("tipo",e.target.value)}>{TIPOS.map(t=><option key={t}>{t}</option>)}</select></div>
 </div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
