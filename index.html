@@ -36,7 +36,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb;box-sh
 <script type="text/babel">
 const {useState,useEffect,useCallback,useMemo}=React;
 const API="https://script.google.com/macros/s/AKfycbzpXyst3RD8yJcAl9OqKuYudQw40e45cYbt6nCcT8cSGcF5l863adi24-1O-swkHgSCmw/exec";
-const ESTADOS=["No Iniciada","En Progreso","Completada","Bloqueada","Archivada"];
+const ESTADOS=["No Iniciada","Avance +","Avance ++","Avance +++","Completada","Bloqueada","Archivada"];
 const PRIOS=["Alta","Media","Baja"];
 const TIPOS=["Táctica","Estratégica"];
 const AREAS=["Operaciones","Calidad","Enologia","Produccion","Finanzas","Logistica","Comercial","RRHH"];
@@ -241,7 +241,7 @@ return(<div className="modal-overlay" onClick={onClose}><div className="modal" s
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Area</label><select value={f.area} onChange={e=>set("area",e.target.value)}>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
 </div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{[...ESTADOS,"Avance +","Avance ++","Avance +++"].map(s=><option key={s}>{s}</option>)}</select></div>
+<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{ESTADOS.map(s=><option key={s}>{s}</option>)}</select></div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Prioridad</label><select value={f.prioridad} onChange={e=>set("prioridad",e.target.value)}>{PRIOS.map(pp=><option key={pp}>{pp}</option>)}</select></div> <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Tipo</label><select value={f.tipo} onChange={e=>set("tipo",e.target.value)}>{TIPOS.map(t=><option key={t}>{t}</option>)}</select></div>
 </div>
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
