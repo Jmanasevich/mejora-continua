@@ -104,13 +104,12 @@ return(<div key={i.id} className="card" style={{cursor:"pointer"}} onClick={()=>
 <span>{"\u2705"} {td}/{tc} tareas</span>
 {tov>0&&<span style={{color:"#ef4444"}}>{"\u{1F534}"} {tov} vencidas</span>}
 </div>}
-<div className="progress-bar"><div className="progress-fill" style={{width:(i.avance||0)+"%",background:"#3b82f6"}}></div></div>
-<p style={{fontSize:11,color:"#94a3b8",marginTop:4}}>{i.avance||0}% {"\u00B7"} {i.fechaCompromiso}</p>
+<p style={{fontSize:11,color:"#94a3b8",marginTop:4}}>{i.fechaCompromiso}</p>
 </div>);})}
 </div>))}</div>}
 {tab==="tabla"&&<div className="card" style={{padding:0,overflow:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
 <thead><tr style={{background:"#f8fafc",borderBottom:"2px solid #e2e8f0"}}>
-{["","Iniciativa","Responsable","Equipo","Tareas","Estado","Avance","Fecha",""].map((h,i)=><th key={i} style={{padding:"12px 14px",textAlign:"left",fontWeight:600,color:"#475569"}}>{h}</th>)}
+{["","Iniciativa","Responsable","Equipo","Tareas","Estado","Fecha",""].map((h,i)=><th key={i} style={{padding:"12px 14px",textAlign:"left",fontWeight:600,color:"#475569"}}>{h}</th>)}
 </tr></thead><tbody>
 {filtradas.filter(i=>i.estado!=="Archivada").map((i,idx)=>{const tc=(i.tareas||[]).length;const td=(i.tareas||[]).filter(t=>t.estado==="Completada").length;
 return(<tr key={i.id} style={{borderBottom:"1px solid #f1f5f9",background:idx%2===0?"white":"#fafafa"}}>
@@ -120,7 +119,6 @@ return(<tr key={i.id} style={{borderBottom:"1px solid #f1f5f9",background:idx%2=
 <td style={{padding:"10px 14px",fontSize:11,color:"#2563eb"}}>{(i.equipo||[]).length>0?(i.equipo||[]).length+" miembros":"-"}</td>
 <td style={{padding:"10px 14px",fontSize:11}}>{tc>0?td+"/"+tc:"-"}</td>
 <td style={{padding:"10px 14px"}}><span className="badge" style={cE(i.estado)}>{i.estado}</span></td>
-<td style={{padding:"10px 14px"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div className="progress-bar" style={{width:60}}><div className="progress-fill" style={{width:(i.avance||0)+"%",background:"#3b82f6"}}></div></div><span style={{fontSize:11,color:"#94a3b8"}}>{i.avance||0}%</span></div></td>
 <td style={{padding:"10px 14px",color:"#94a3b8",fontSize:12}}>{i.fechaCompromiso}</td>
 <td style={{padding:"10px 14px"}}><div style={{display:"flex",gap:6}}>
 <button className="btn btn-secondary" style={{padding:"4px 10px",fontSize:12}} onClick={()=>{sEdit(i);sShowF(true);}}>{"\u270F\uFE0F"}</button>
@@ -155,7 +153,7 @@ return(<tr key={t.id||idx} style={{borderBottom:"1px solid #f1f5f9",background:o
 {venc.length===0&&ini.filter(i=>i.estado==="Bloqueada").length===0?<div className="card" style={{textAlign:"center",color:"#166534",background:"#f0fdf4",padding:40}}>Sin alertas de iniciativas</div>:
 [...new Map([...venc,...ini.filter(i=>i.estado==="Bloqueada")].map(i=>[i.id,i])).values()].map(i=>(
 <div key={i.id} className="card" style={{borderLeft:"4px solid #f87171",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-<div><p style={{fontWeight:700,margin:"0 0 4px"}}>{i.nombre}</p><p style={{fontSize:13,color:"#64748b",margin:0}}>{i.responsable||"Sin responsable"} - {i.fechaCompromiso} - {i.avance||0}%</p></div>
+<div><p style={{fontWeight:700,margin:"0 0 4px"}}>{i.nombre}</p><p style={{fontSize:13,color:"#64748b",margin:0}}>{i.responsable||"Sin responsable"} - {i.fechaCompromiso}</p></div>
 <div style={{display:"flex",gap:8,marginLeft:12}}>
 <button className="btn btn-secondary" style={{fontSize:12}} onClick={()=>{sEdit(i);sShowF(true);}}>Editar</button>
 <button className="btn btn-secondary" style={{fontSize:12}} onClick={()=>gmail(i)}>Email</button>
