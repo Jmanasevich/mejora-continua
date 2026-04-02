@@ -28,7 +28,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb;box-sh
 .task-blocked{border-left:3px solid #f59e0b}
 .dropdown-menu{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:200px;overflow-y:auto;z-index:60}
 .dropdown-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px}
-.dropdown-item:hover{background:#eff6ff}
+.dropdown-item:hover{background:#hheff6ff}
 </style>
 </head>
 <body>
@@ -244,11 +244,7 @@ return(<div className="modal-overlay" onClick={onClose}><div className="modal" s
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Estado</label><select value={f.estado} onChange={e=>set("estado",e.target.value)}>{ESTADOS.map(s=><option key={s}>{s}</option>)}</select></div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Prioridad</label><select value={f.prioridad} onChange={e=>set("prioridad",e.target.value)}>{PRIOS.map(pp=><option key={pp}>{pp}</option>)}</select></div> <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Tipo</label><select value={f.tipo} onChange={e=>set("tipo",e.target.value)}>{TIPOS.map(t=><option key={t}>{t}</option>)}</select></div>
 </div>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-<div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Avance: {taskCount>0?autoAvance:(f.avance||0)}%{taskCount>0&&<span style={{fontSize:11,color:"#2563eb",marginLeft:6}}>(auto: {taskDone}/{taskCount} tareas)</span>}</label>
-{taskCount===0?<input type="range" min="0" max="100" value={f.avance||0} onChange={e=>set("avance",Number(e.target.value))} style={{border:"none",padding:"8px 0",background:"none",width:"100%"}}/>:
-<div className="progress-bar" style={{height:12,marginTop:8}}><div className="progress-fill" style={{width:autoAvance+"%",background:autoAvance===100?"#22c55e":"#3b82f6"}}></div></div>}
-</div>
+<div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Fecha Compromiso</label><input type="date" value={f.fechaCompromiso} onChange={e=>set("fechaCompromiso",e.target.value)}/></div>
 </div>
 <div><label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>Observaciones</label><textarea value={f.observaciones} onChange={e=>set("observaciones",e.target.value)} rows={3}/></div>
